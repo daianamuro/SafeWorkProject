@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState } from "react";
+import { validate } from "../helpers/Regex";
 
 export const useRegister = () => {
     const [name, setName] = useState("");
@@ -8,27 +8,31 @@ export const useRegister = () => {
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("");
 
-    const handleRegisterBtn = async () => {
-        if (name.trim() === "" || lastname.trim() === "" || email.trim() === "" || password.trim() === "" || role.trim() === "") {
-            return alert("Llene todos los campos");
+    const handleRegisterBtn = () => {
+        if (!name || !lastname || !email || !password || !role) {
+            alert("Llena todos los campos");
+            return false;
         }
 
-        const user = { name, lastname, email, password, role };
-        const texto = JSON.stringify(user);
-
-        try {
-            let usuarios = await AsyncStorage.getItem('usuarios');
-            usuarios = usuarios ? JSON.parse(usuarios) : [];
-            usuarios.push(user);
-            await AsyncStorage.setItem('usuarios', JSON.stringify(usuarios));
-            alert("Datos guardados correctamente");
-
-            // Limpiar inputs
-            setName(""); setLastname(""); setEmail(""); setPassword(""); setRole("");
-        } catch(e) {
-            console.error("Error guardando usuario:", e);
+        if (!validate("email", email)) {
+            alert("Correo inválido");
+            return false;
         }
-    }
 
-    return { name, setName, lastname, setLastname, email, setEmail, password, setPassword, role, setRole, handleRegisterBtn };
-}
+        if (!validate("password", password)) {
+            alert("Contraseña inválida");
+            return false;
+        }
+
+        return true;
+    };
+
+    return {
+        name, setName,
+        lastname, setLastname,
+        email, setEmail,
+        password, setPassword,
+        role, setRole,
+        handleRegisterBtn
+    };
+};

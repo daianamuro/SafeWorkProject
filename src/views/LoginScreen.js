@@ -1,98 +1,38 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { Button, Text, TextInput, View } from "react-native";
+import { guardarToken } from "../helpers/security";
 import { useLogin } from "../hooks/useLogin";
-import { useNavigation } from "@react-navigation/native";
+import { login } from "../services/loginService";
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
+
     const { email, setEmail, password, setPassword, handleLoginBtn } = useLogin();
-    const navigation = useNavigation();
 
-    const probarLogin = async () => {
+    const onLogin = async () => {
+        console.log("Click")
         if (!handleLoginBtn()) return;
 
-        const respuesta = await login(email, password);
+        const res = await login(email, password);
 
-        if (respuesta.token) {
-            alert("Home");
+        if (res.token) {
+            await guardarToken(res.token);
+
+            // 🔥 ir a HOME
+            navigation.replace("Home");
+
         } else {
-            alert("Error 👎");
+            alert("Error en login");
         }
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.card}>
-                
-                <Text style={styles.title}>Login</Text>
+        <View style={{ marginTop: 50 }}>
+            <Text>Login</Text>
 
-                <TextInput
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                    style={styles.input}
-                />
+            <TextInput placeholder="Email" value={email} onChangeText={setEmail}/>
+            <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry/>
 
-                <TextInput
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    style={styles.input}
-                />
-
-                <TouchableOpacity style={styles.button} onPress={probarLogin}>
-                    <Text style={styles.buttonText}>Login</Text>
-                </TouchableOpacity>
-
-                {/* Botón para ir a register */}
-                <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-                    <Text style={styles.link}>Don't have an account? Register</Text>
-                </TouchableOpacity>
-
-            </View>
+            <Button title="Login" onPress={onLogin} />
+            <Button title="No tengo cuenta" onPress={() => navigation.navigate("SignUp")} />
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#7fa1b3",
-    },
-    card: {
-        width: "85%",
-        backgroundColor: "#fff",
-        padding: 20,
-        borderRadius: 12,
-        elevation: 5,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: "bold",
-        marginBottom: 20,
-        textAlign: "center",
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 15,
-    },
-    button: {
-        backgroundColor: "#1f2a7a",
-        padding: 12,
-        borderRadius: 8,
-        alignItems: "center",
-        marginBottom: 10,
-    },
-    buttonText: {
-        color: "#fff",
-        fontWeight: "bold",
-    },
-    link: {
-        textAlign: "center",
-        marginTop: 10,
-    },
-});
