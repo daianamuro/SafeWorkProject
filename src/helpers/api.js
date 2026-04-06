@@ -1,14 +1,11 @@
-//localHost:33030/api/users/getUser
-
-
 import axios from 'axios'
-import { getToken } from "../helpers/getToken"
+import { getToken } from "./getToken"
 
 export const api = axios.create({
-    baseURL: "localHost:33030/api/users",
+    baseURL: "https://save-work-utr-project.onrender.com",
     timeout: 10000,
     headers: {
-        "Content-Type": "application/jason"
+        "Content-Type": "application/json"
     }
 })
 

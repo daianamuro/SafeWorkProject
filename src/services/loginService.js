@@ -1,17 +1,15 @@
+import api from "../helpers/api";
+
 export const login = async (email, password) => {
     try {
-        const response = await fetch("https://save-work-utr-project.onrender.com/api/usuario/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ email, password })
+        const response = await api.post("/api/usuario/login", {
+            email,
+            password
         });
 
-        const data = await response.json();
-        return data;
-
+        return response.data;
     } catch (error) {
-        return { error: "Error de conexión" };
+        console.error("Error en register:", error.response?.data || error.message);
+        throw error;
     }
 };

@@ -1,35 +1,29 @@
-import * as Keychain from 'react-native-keychain';
+import * as SecureStore from 'expo-secure-store';
 
-// 🔹 Guardar token
-export const guardarToken = async (token) => {
+export const getToken = async (key) => {
     try {
-        await Keychain.setGenericPassword("userToken", token);
+        const token = await SecureStore.getItemAsync(key);
+        return token;
     } catch (error) {
-        console.error("Error guardando token", error);
-    }
-};
-
-// 🔹 Obtener token
-export const obtenerToken = async () => {
-    try {
-        const credentials = await Keychain.getGenericPassword();
-
-        if (credentials) {
-            return credentials.password;
-        }
-
-        return null;
-    } catch (error) {
-        console.error("Error obteniendo token", error);
+        console.log("Error obteniendo token", error);
         return null;
     }
 };
 
-// 🔹 Eliminar token
-export const eliminarToken = async () => {
+
+export const guardarToken = async (key, value) => {
     try {
-        await Keychain.resetGenericPassword();
+        console.log(key, value)
+        await SecureStore.setItemAsync(key, value);
     } catch (error) {
-        console.error("Error eliminando token", error);
+        console.log("Error guardando token", error);
+    }
+};
+
+export const eliminarToken = async (key) => {
+    try {
+        await SecureStore.deleteItemAsync(key);
+    } catch (error) {
+        console.log("Error eliminando token", error);
     }
 };

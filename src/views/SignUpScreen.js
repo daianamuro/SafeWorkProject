@@ -24,11 +24,8 @@ export default function SignUpScreen({ navigation }) {
         const res = await register(user);
 
         if (res.token || res.success) {
-            alert("Registro exitoso 🔥");
-
-            // 🔥 volver a login
+            alert("Registro exitoso ");
             navigation.replace("Login");
-
         } else {
             alert("Error en registro");
         }

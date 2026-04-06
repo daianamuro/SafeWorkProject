@@ -9,7 +9,13 @@ export const useRegister = () => {
     const [role, setRole] = useState("");
 
     const handleRegisterBtn = () => {
-        if (!name || !lastname || !email || !password || !role) {
+        if (
+            !name.trim() ||
+            !lastname.trim() ||
+            !email.trim() ||
+            !password.trim() ||
+            !role.trim()
+        ) {
             alert("Llena todos los campos");
             return false;
         }
