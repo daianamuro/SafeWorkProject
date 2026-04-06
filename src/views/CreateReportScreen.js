@@ -1,83 +1,86 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import { useState } from "react";
-import { createReport } from "../services/reportService";
 import { useNavigation } from "@react-navigation/native";
+import {
+    Image,
+    StyleSheet,
+    Text,
+    View
+} from "react-native";
+
+import useCreate from "../hooks/useCreate";
+
+import ActionButton from "../components/ActionButton";
+import Card from "../components/Card";
+import Input from "../components/Input";
+import PrioritySelector from "../components/PrioritySelector";
 
 export default function CreateReportScreen() {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [priority, setPriority] = useState("low");
-
     const navigation = useNavigation();
 
-    const handleCreate = async () => {
-        if (!title || !description) {
-            alert("Completa todos los campos");
-            return;
-        }
-
-        const newReport = {
-            title,
-            description,
-            priority
-        };
-
-        const response = await createReport(newReport);
-
-        if (response) {
-            alert("Reporte creado");
-            navigation.navigate("Home");
-        } else {
-            alert("Error");
-        }
-    };
+    const {
+        title,
+        setTitle,
+        description,
+        setDescription,
+        priority,
+        setPriority,
+        loading,
+        handleCreate,
+        getPriorityConfig
+    } = useCreate(navigation);
 
     return (
         <View style={styles.container}>
-            
-            <Text style={styles.logo}>SafeWork</Text>
+
+            <Image
+                source={require("../../assets/images/logo.png")}
+                style={styles.logo}
+            />
+
             <Text style={styles.title}>Create a new report</Text>
 
-            <Text>Title:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Enter title"
-                value={title}
-                onChangeText={setTitle}
-            />
+            <Card>
+                <Input
+                    label="Title"
+                    value={title}
+                    onChangeText={setTitle}
+                    placeholder="Enter title"
+                />
+            </Card>
 
-            <Text>Priority:</Text>
-            <View style={styles.row}>
-                {["high", "medium", "low"].map(p => (
-                    <TouchableOpacity
-                        key={p}
-                        style={[
-                            styles.priorityBtn,
-                            priority === p && styles.active
-                        ]}
-                        onPress={() => setPriority(p)}
-                    >
-                        <Text>{p}</Text>
-                    </TouchableOpacity>
-                ))}
+            <Card>
+                <Text style={styles.label}>Priority</Text>
+                <PrioritySelector
+                    value={priority}
+                    onChange={setPriority}
+                    getPriorityConfig={getPriorityConfig}
+                />
+            </Card>
+
+            <Card>
+                <Input
+                    label="Description"
+                    value={description}
+                    onChangeText={setDescription}
+                    multiline
+                    placeholder="Enter description"
+                />
+            </Card>
+
+            <View style={styles.actionsRow}>
+                <ActionButton
+                    title={loading ? "Creating..." : "Create"}
+                    icon="check-circle"
+                    color="#1f2a7a"
+                    onPress={handleCreate}
+                />
+
+                <ActionButton
+                    title="Cancel"
+                    icon="cancel"
+                    color="#dc3545"
+                    onPress={() => navigation.goBack()}
+                />
             </View>
-
-            <Text>Description:</Text>
-            <TextInput
-                style={[styles.input, { height: 100 }]}
-                placeholder="Enter description"
-                value={description}
-                onChangeText={setDescription}
-                multiline
-            />
-
-            <TouchableOpacity style={styles.createBtn} onPress={handleCreate}>
-                <Text style={styles.btnText}>CREATE</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text style={styles.cancel}>CANCEL</Text>
-            </TouchableOpacity>
 
         </View>
     );
@@ -87,53 +90,32 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: "#f5f5f5",
+        backgroundColor: "#7fa1b3",
     },
+
     logo: {
-        fontSize: 24,
-        fontWeight: "bold",
-        textAlign: "center",
+        width: 200,
+        height: 200,
+        alignSelf: "center",
         marginBottom: 10,
     },
+
     title: {
         fontSize: 20,
-        marginBottom: 15,
+        marginBottom: 20,
+        fontWeight: "600",
     },
-    input: {
-        backgroundColor: "#fff",
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 15,
+
+    label: {
+        fontSize: 12,
+        color: "#6c757d",
+        marginBottom: 5,
     },
-    row: {
+
+    actionsRow: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 15,
-    },
-    priorityBtn: {
-        padding: 10,
-        backgroundColor: "#ddd",
-        borderRadius: 8,
-        width: "30%",
-        alignItems: "center",
-    },
-    active: {
-        backgroundColor: "#1f2a7a",
-        color: "#fff",
-    },
-    createBtn: {
-        backgroundColor: "#1f2a7a",
-        padding: 15,
-        borderRadius: 20,
-        alignItems: "center",
-        marginTop: 10,
-    },
-    btnText: {
-        color: "#fff",
-        fontWeight: "bold",
-    },
-    cancel: {
-        textAlign: "center",
         marginTop: 15,
+        gap: 10,
     },
 });

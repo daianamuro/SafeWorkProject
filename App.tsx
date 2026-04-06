@@ -5,6 +5,7 @@ import LoginScreen from "./src/views/LoginScreen";
 import SignUpScreen from "./src/views/SignUpScreen";
 import HomeScreen from "./src/views/HomeScreen";
 import CreateReportScreen from "./src/views/CreateReportScreen";
+import ReportDetailScreen from "./src/views/ReportDetailScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +17,7 @@ export default function App() {
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="CreateReport" component={CreateReportScreen} />
+        <Stack.Screen name="ReportDetail" component={ReportDetailScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
