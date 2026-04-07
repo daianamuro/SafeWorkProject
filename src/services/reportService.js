@@ -1,33 +1,60 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import api, { ENDPOINTS } from '../models/api';
 
-// Obtener todos los reportes guardados en el celular/navegador
+// GET ALL
 export const getAllReports = async () => {
     try {
-        const storedReports = await AsyncStorage.getItem('reports');
-        return storedReports ? JSON.parse(storedReports) : [];
+        const res = await api.get(ENDPOINTS.getAllReports);
+        return { ok: true, data: res.data };
     } catch (error) {
-        console.error("Error cargando reportes locales:", error);
-        return [];
+        console.error("Error cargando reportes:", error?.response?.data || error.message);
+        return { 
+            ok: false,
+            data: [],
+            error: error?.response?.data || "Error desconocido"
+        };
     }
 };
 
-// Guardar un nuevo reporte localmente
+// CREATE
 export const createReport = async (report) => {
     try {
-        // 1. Traer los que ya existen
-        let reports = await AsyncStorage.getItem('reports');
-        reports = reports ? JSON.parse(reports) : [];
-        
-        // 2. Agregar el nuevo reporte a la lista
-        reports.push(report);
-        
-        // 3. Guardar la lista actualizada
-        await AsyncStorage.setItem('reports', JSON.stringify(reports));
-        
-        // 4. Devolvemos algo que NO sea null para que el IF de tu pantalla sea exitoso
-        return { status: "ok", data: report }; 
+        const res = await api.post(ENDPOINTS.createReport, report);
+        return { ok: true, data: res.data };
     } catch (error) {
-        console.error("Error guardando reporte local:", error);
-        return null; // Solo aquí daría el alert de error
+        console.error("Error creando reporte:", error?.response?.data || error.message);
+        return { ok: false, data: null, error: error?.response?.data || "Error desconocido" };
+    }
+};
+
+// GET BY ID
+export const getReportById = async (id) => {
+    try {
+        const res = await api.get(ENDPOINTS.getReportById(id));
+        return { ok: true, data: res.data };
+    } catch (error) {
+        console.error("Error obteniendo reporte:", error?.response?.data || error.message);
+        return { ok: false, data: null, error: error?.response?.data || "Error desconocido" };
+    }
+};
+
+// DELETE
+export const deleteReport = async (id) => {
+    try {
+        await api.delete(ENDPOINTS.deleteReport(id));
+        return { ok: true };
+    } catch (error) {
+        console.error("Error eliminando:", error?.response?.data || error.message);
+        return { ok: false, error: error?.response?.data || "Error desconocido" };
+    }
+};
+
+// UPDATE
+export const updateReport = async (id, data) => {
+    try {
+        const res = await api.put(ENDPOINTS.updateReport(id), data);
+        return { ok: true, data: res.data };
+    } catch (error) {
+        console.error("Error actualizando:", error?.response?.data || error.message);
+        return { ok: false, data: null, error: error?.response?.data || "Error desconocido" };
     }
 };
