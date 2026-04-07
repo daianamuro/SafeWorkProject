@@ -17,15 +17,17 @@ export default function useCreate(navigation) {
             setLoading(true);
 
             const newReport = { title, description, priority };
+            console.log("Create response:", newReport);
             const response = await createReport(newReport);
+            console.log("Create response:", response);
 
             if (!response.ok) {
-                return alert("Error creating report");
+                return alert(response.error || "Error creating report");
             }
 
             resetForm();
-            navigation.navigate("Home");
             alert("Report created successfully");
+            navigation.navigate("Home");
 
         } catch (error) {
             console.error(error);

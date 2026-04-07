@@ -1,104 +1,60 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const REPORTS_STORAGE_KEY = 'reports';
-
-const readReports = async () => {
-    const storedReports = await AsyncStorage.getItem(REPORTS_STORAGE_KEY);
-    return storedReports ? JSON.parse(storedReports) : [];
-};
-
-const writeReports = async (reports) => {
-    await AsyncStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(reports));
-};
+import api, { ENDPOINTS } from '../models/api';
 
 // GET ALL
 export const getAllReports = async () => {
     try {
-        const data = await readReports();
-        return { ok: true, data };
+        const res = await api.get(ENDPOINTS.getAllReports);
+        return { ok: true, data: res.data };
     } catch (error) {
-        console.error("Error cargando reportes:", error);
-        return { ok: false, data: [], error };
+        console.error("Error cargando reportes:", error?.response?.data || error.message);
+        return { 
+            ok: false,
+            data: [],
+            error: error?.response?.data || "Error desconocido"
+        };
     }
 };
 
 // CREATE
 export const createReport = async (report) => {
     try {
-        const reports = await readReports();
-
-        const now = new Date().toISOString();
-
-        const newReport = {
-            id: Date.now().toString(),
-            title: report.title,
-            description: report.description,
-            priority: report.priority ?? "low",
-            user: report.user ?? { name: "Local User" },
-            createdAt: now,
-            updatedAt: null
-        };
-
-        reports.push(newReport);
-        await writeReports(reports);
-
-        return { ok: true, data: newReport };
+        const res = await api.post(ENDPOINTS.createReport, report);
+        return { ok: true, data: res.data };
     } catch (error) {
-        console.error("Error creando reporte:", error);
-        return { ok: false, data: null, error };
+        console.error("Error creando reporte:", error?.response?.data || error.message);
+        return { ok: false, data: null, error: error?.response?.data || "Error desconocido" };
     }
 };
 
 // GET BY ID
 export const getReportById = async (id) => {
     try {
-        const reports = await readReports();
-        const report = reports.find(r => String(r.id) === String(id));
-
-        return { ok: true, data: report ?? null };
+        const res = await api.get(ENDPOINTS.getReportById(id));
+        return { ok: true, data: res.data };
     } catch (error) {
-        console.error("Error obteniendo reporte:", error);
-        return { ok: false, data: null, error };
+        console.error("Error obteniendo reporte:", error?.response?.data || error.message);
+        return { ok: false, data: null, error: error?.response?.data || "Error desconocido" };
     }
 };
 
 // DELETE
 export const deleteReport = async (id) => {
     try {
-        const reports = await readReports();
-
-        const filtered = reports.filter(r => String(r.id) !== String(id));
-        await writeReports(filtered);
-
+        await api.delete(ENDPOINTS.deleteReport(id));
         return { ok: true };
     } catch (error) {
-        console.error("Error eliminando:", error);
-        return { ok: false, error };
+        console.error("Error eliminando:", error?.response?.data || error.message);
+        return { ok: false, error: error?.response?.data || "Error desconocido" };
     }
 };
 
 // UPDATE
 export const updateReport = async (id, data) => {
     try {
-        const reports = await readReports();
-
-        const updatedReports = reports.map(r =>
-            String(r.id) === String(id)
-                ? {
-                    ...r,
-                    ...data,
-                    updatedAt: new Date().toISOString()
-                }
-                : r
-        );
-
-        await writeReports(updatedReports);
-
-        const updated = updatedReports.find(r => String(r.id) === String(id));
-
-        return { ok: true, data: updated };
+        const res = await api.put(ENDPOINTS.updateReport(id), data);
+        return { ok: true, data: res.data };
     } catch (error) {
-        console.error("Error actualizando:", error);
-        return { ok: false, data: null, error };
+        console.error("Error actualizando:", error?.response?.data || error.message);
+        return { ok: false, data: null, error: error?.response?.data || "Error desconocido" };
     }
 };
