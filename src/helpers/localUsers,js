@@ -1,0 +1,11 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export const getUsersOffline = async () => {
+  try {
+    const data = await AsyncStorage.getItem("users");
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error("Error leyendo usuarios offline:", error);
+    return [];
+  }
+};
