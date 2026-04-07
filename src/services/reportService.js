@@ -27,13 +27,16 @@ export const createReport = async (report) => {
     try {
         const reports = await readReports();
 
+        const now = new Date().toISOString();
+
         const newReport = {
             id: Date.now().toString(),
             title: report.title,
             description: report.description,
             priority: report.priority ?? "low",
             user: report.user ?? { name: "Local User" },
-            creation_date: new Date().toISOString(),
+            createdAt: now,
+            updatedAt: null
         };
 
         reports.push(newReport);
@@ -81,7 +84,11 @@ export const updateReport = async (id, data) => {
 
         const updatedReports = reports.map(r =>
             String(r.id) === String(id)
-                ? { ...r, ...data }
+                ? {
+                    ...r,
+                    ...data,
+                    updatedAt: new Date().toISOString()
+                }
                 : r
         );
 

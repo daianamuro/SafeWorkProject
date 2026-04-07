@@ -1,4 +1,4 @@
-import { Image, Text, View, StyleSheet } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import useReport from "../hooks/useReport";
 
 import ActionButton from "../components/ActionButton";
@@ -18,7 +18,8 @@ export default function ReportDetailScreen({ route, navigation }) {
         handleUpdate,
         getPriorityConfig,
         updateField,
-        formattedDate
+        formattedDate,
+        formattedUpdatedDate
     } = useReport(id, navigation);
 
     if (loading) return <Text style={styles.status}>Loading...</Text>;
@@ -65,7 +66,10 @@ export default function ReportDetailScreen({ route, navigation }) {
 
             <Card>
                 <Text>Created by: {report.user?.name ?? "Unknown"}</Text>
-                <Text>At: {formattedDate}</Text>
+                <Text>Created at: {formattedDate}</Text>
+                {report.updatedAt && (
+                    <Text>Updated at: {formattedUpdatedDate}</Text>
+                )}
             </Card>
 
             <View style={styles.actionsRow}>

@@ -1,12 +1,23 @@
-import { useState, useCallback } from "react";
-import { Animated } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useEffect, useState } from "react";
+import { Animated } from "react-native";
 import { getAllReports } from "../services/reportService";
 
 export default function useHome() {
     const [reports, setReports] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const fadeAnim = useState(new Animated.Value(0))[0];
+
+    // Tiempo actual para actualización automática
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTime(new Date());
+        }, 60000); // cada minuto
+
+        return () => clearInterval(interval);
+    }, []);
 
     useFocusEffect(
         useCallback(() => {
@@ -39,7 +50,32 @@ export default function useHome() {
 
     const total = reports.length;
     const high = reports.filter(r => r.priority === "high").length;
-    const lastUpdate = reports.length > 0 ? 2 : 0;
+
+    // LAST UPDATE REAL
+    const lastUpdate = (() => {
+        if (reports.length === 0) return 0;
+
+        const latestDate = reports.reduce((latest, report) => {
+            const created = report.createdAt ? new Date(report.createdAt) : null;
+            const updated = report.updatedAt ? new Date(report.updatedAt) : null;
+
+            const reportDate = updated || created;
+
+            if (!latest) return reportDate;
+
+            return reportDate > latest ? reportDate : latest;
+        }, null);
+
+        if (!latestDate) return 0;
+
+        const now = currentTime;
+        const diffMs = now - latestDate;
+
+        return Math.floor(diffMs / 60000);
+    })();
+
+    const lastUpdateLabel =
+        lastUpdate === 0 ? "Just now" : `${lastUpdate} min`;
 
     const getPriorityConfig = (priority) => {
         switch (priority) {
@@ -59,7 +95,7 @@ export default function useHome() {
         onRefresh,
         total,
         high,
-        lastUpdate,
+        lastUpdate: lastUpdateLabel, 
         getPriorityConfig
     };
 }

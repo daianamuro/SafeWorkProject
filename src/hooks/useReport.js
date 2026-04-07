@@ -60,10 +60,18 @@ export default function useReport(id, navigation) {
         setReport(prev => ({ ...prev, [field]: value }));
     };
 
-    const date = report?.creation_date ? new Date(report.creation_date) : null;
+    // CREATED DATE
+    const createdDate = report?.createdAt ? new Date(report.createdAt) : null;
 
-    const formattedDate = date
-        ? `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+    const formattedDate = createdDate
+        ? `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+        : "No date";
+
+    //  UPDATED DATE
+    const updatedDate = report?.updatedAt ? new Date(report.updatedAt) : null;
+
+    const formattedUpdatedDate = updatedDate
+        ? `${updatedDate.toLocaleDateString()} ${updatedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
         : "No date";
 
     return {
@@ -76,6 +84,7 @@ export default function useReport(id, navigation) {
         handleUpdate,
         getPriorityConfig,
         updateField,
-        formattedDate
+        formattedDate,
+        formattedUpdatedDate
     };
 }
