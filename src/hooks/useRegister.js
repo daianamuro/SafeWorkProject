@@ -6,7 +6,7 @@ export const useRegister = () => {
     const [lastname, setLastname] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState("");
+    const [confirm, setConfirm] = useState("");
 
     const handleRegisterBtn = () => {
         if (
@@ -14,7 +14,7 @@ export const useRegister = () => {
             !lastname.trim() ||
             !email.trim() ||
             !password.trim() ||
-            !role.trim()
+            !confirm.trim()
         ) {
             alert("Please fill in all fields");
             return false;
@@ -29,6 +29,10 @@ export const useRegister = () => {
             alert("Invalid password");
             return false;
         }
+        if (password !== confirm) {
+        alert('Las contraseñas no coinciden');
+        return false;
+    }
 
         return true;
     };
@@ -38,7 +42,7 @@ export const useRegister = () => {
         lastname, setLastname,
         email, setEmail,
         password, setPassword,
-        role, setRole,
+        confirm, setConfirm,
         handleRegisterBtn
     };
 };

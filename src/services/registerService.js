@@ -6,7 +6,6 @@ export const register = async (user) => {
             lastname: user.lastname.trim(),
             email: user.email.trim(),
             password: user.password.trim(),
-            role: user.role.trim()
         });
 
         return {

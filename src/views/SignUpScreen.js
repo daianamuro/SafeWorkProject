@@ -1,5 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ActionButton from "../components/ActionButton";
 import Card from "../components/Card";
@@ -17,8 +17,8 @@ export default function SignUpScreen({ navigation }) {
     setEmail,
     password,
     setPassword,
-    role,
-    setRole,
+    confirm,
+    setConfirm,
     handleRegisterBtn
   } = useRegister();
 
@@ -26,18 +26,24 @@ export default function SignUpScreen({ navigation }) {
     try {
       const existing = await AsyncStorage.getItem("users");
       const users = existing ? JSON.parse(existing) : [];
-      users.push(user);
-      await AsyncStorage.setItem("users", JSON.stringify(users));
-      console.log("User saved offline");
+
+      // evitar duplicados por email
+      const filtered = users.filter(u => u.email !== user.email);
+
+      filtered.push(user);
+
+      await AsyncStorage.setItem("users", JSON.stringify(filtered));
+
+      console.log("Usuarios guardados:", filtered);
     } catch (error) {
       console.error("Error saving offline user:", error);
     }
   };
-
+  
   const onRegister = async () => {
     if (!handleRegisterBtn()) return;
 
-    const user = { name, lastname, email, password, role };
+    const user = { name, lastname, email, password };
     console.log("Sending user:", user);
 
     try {
@@ -111,10 +117,10 @@ export default function SignUpScreen({ navigation }) {
 
         <Card>
           <Input
-            label="Role"
-            value={role}
-            onChangeText={setRole}
-            placeholder="Enter your role"
+            label="Confirm"
+            value={confirm}
+            onChangeText={setConfirm}
+            placeholder="Confirm your password"
           />
         </Card>
 
