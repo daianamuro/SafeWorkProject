@@ -39,7 +39,7 @@ export default function SignUpScreen({ navigation }) {
       console.error("Error saving offline user:", error);
     }
   };
-  
+
   const onRegister = async () => {
     if (!handleRegisterBtn()) return;
 

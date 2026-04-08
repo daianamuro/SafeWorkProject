@@ -30,7 +30,7 @@ export const useRegister = () => {
             return false;
         }
         if (password !== confirm) {
-        alert('Las contraseñas no coinciden');
+        alert('Passwords dont match');
         return false;
     }
 
