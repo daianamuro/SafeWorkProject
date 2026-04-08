@@ -1,60 +1,97 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { eliminarToken, getToken, guardarToken } from '../helpers/getToken';
 
 // URL base de la API
 const BASE_URL = 'https://save-work-utr-project.onrender.com';
 
+// Instancia de axios
 const api = axios.create({
   baseURL: BASE_URL,
+  timeout: 10000,
+  headers: {
+    "Content-Type": "application/json"
+  }
 });
 
+// TOKEN FUNCTIONS
 
-// Obtener token
-const getToken = async () => {
-  return await AsyncStorage.getItem('token');
+// Get token
+const getStoredToken = async () => {
+  try {
+    const token = await getToken('JWTToken');
+    return token;
+  } catch (error) {
+    console.log("Error getting token:", error);
+    return null;
+  }
 };
 
-// Eliminar token
-const removeToken = async () => {
-  await AsyncStorage.removeItem('token');
+// Save token
+export const saveToken = async (token) => {
+  try {
+    await guardarToken('JWTToken', token);
+    console.log("Token saved successfully");
+  } catch (error) {
+    console.log("Error saving token:", error);
+  }
 };
 
+// Delete token
+export const removeToken = async () => {
+  try {
+    await eliminarToken('JWTToken');
+    console.log("Token deleted");
+  } catch (error) {
+    console.log("Error deleting token:", error);
+  }
+};
 
-// REQUEST: agrega token automáticamente
+// INTERCEPTOR REQUEST
+
 api.interceptors.request.use(
   async (config) => {
     try {
-      const token = await getToken();
+      const token = await getStoredToken();
+
+      console.log("Token sent:", token);
 
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`; 
+        config.headers.Authorization = `Bearer ${token}`;
       }
 
       return config;
     } catch (error) {
+      console.log("Request interceptor error:", error);
       return Promise.reject(error);
     }
   },
   (error) => Promise.reject(error)
 );
 
+// INTERCEPTOR RESPONSE
 
-// RESPONSE: detectar token expirado
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+
+    console.log("STATUS:", error?.response?.status);
+    console.log("DATA:", error?.response?.data);
+
+    // Expired or invalid token
     if (error?.response?.status === 401) {
-      console.log("Token expirado → cerrando sesión");
+      console.log("Expired token -> logging out");
 
       await removeToken();
+
+      // You could redirect to login here if needed
     }
 
     return Promise.reject(error);
   }
 );
 
-
 // ENDPOINTS
+
 export const ENDPOINTS = {
 
   // AUTH
@@ -64,10 +101,9 @@ export const ENDPOINTS = {
   // REPORTES
   getAllReports: '/api/getAllReports',
   getReportById: (id) => `/api/getReport/${id}`,
-  createReport: '/api/createReports',
+  createReport: '/api/createReports', // 
   updateReport: (id) => `/api/updateReport/${id}`,
   deleteReport: (id) => `/api/deleteReport/${id}`,
-
 };
 
 export default api;

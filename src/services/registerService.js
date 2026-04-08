@@ -1,7 +1,7 @@
-import { api } from "../helpers/api";
+import apiClient from "../helpers/api";
 export const register = async (user) => {
     try {
-        const response = await api.post("/api/usuario/register", {
+        const response = await apiClient.post("/api/usuario/register", {
             name: user.name.trim(),
             lastname: user.lastname.trim(),
             email: user.email.trim(),
@@ -9,11 +9,16 @@ export const register = async (user) => {
             role: user.role.trim()
         });
 
-        return response.data;
+        return {
+            ok: true,
+            data: response.data
+        };
     } catch (error) {
         console.log("STATUS:", error.response?.status);
         console.log("DATA:", error.response?.data);
-        console.log("FULL ERROR:", error);
-        throw error;
+        return {
+            ok: false,
+            error: error.response?.data?.message || error.response?.data?.error || error.message || "Registration failed"
+        };
     }
 };

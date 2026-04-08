@@ -19,7 +19,8 @@ export default function ReportDetailScreen({ route, navigation }) {
         getPriorityConfig,
         updateField,
         formattedDate,
-        formattedUpdatedDate
+        formattedUpdatedDate,
+        hasBeenUpdated
     } = useReport(id, navigation);
 
     if (loading) return <Text style={styles.status}>Loading...</Text>;
@@ -67,7 +68,7 @@ export default function ReportDetailScreen({ route, navigation }) {
             <Card>
                 <Text>Created by: {report.user?.name ?? "Unknown"}</Text>
                 <Text>Created at: {formattedDate}</Text>
-                {report.updatedAt && (
+                {hasBeenUpdated && (
                     <Text>Updated at: {formattedUpdatedDate}</Text>
                 )}
             </Card>
@@ -118,8 +119,8 @@ const styles = StyleSheet.create({
     },
 
     logo: {
-        width: 120,
-        height: 120,
+        width: 160,
+        height: 160,
         alignSelf: "center",
         marginBottom: 10,
     },

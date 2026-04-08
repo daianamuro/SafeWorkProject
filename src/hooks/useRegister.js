@@ -16,17 +16,17 @@ export const useRegister = () => {
             !password.trim() ||
             !role.trim()
         ) {
-            alert("Llena todos los campos");
+            alert("Please fill in all fields");
             return false;
         }
 
         if (!validate("email", email)) {
-            alert("Correo inválido");
+            alert("Invalid email");
             return false;
         }
 
         if (!validate("password", password)) {
-            alert("Contraseña inválida");
+            alert("Invalid password");
             return false;
         }
 

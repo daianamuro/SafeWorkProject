@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { deleteReport, getReportById, updateReport } from "../services/reportService";
 
 export default function useReport(id, navigation) {
@@ -6,13 +6,13 @@ export default function useReport(id, navigation) {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        loadReport();
-    }, [id]);
-
-    const loadReport = async () => {
+    const loadReport = useCallback(async () => {
         try {
-            if (!id) return;
+            if (!id || id === "undefined") {
+                console.error("Invalid report id:", id);
+                setReport(null);
+                return;
+            }
 
             const res = await getReportById(id);
 
@@ -28,7 +28,11 @@ export default function useReport(id, navigation) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
+
+    useEffect(() => {
+        loadReport();
+    }, [loadReport]);
 
     const handleDelete = async () => {
         const response = await deleteReport(id);
@@ -69,6 +73,10 @@ export default function useReport(id, navigation) {
 
     //  UPDATED DATE
     const updatedDate = report?.updatedAt ? new Date(report.updatedAt) : null;
+    const hasBeenUpdated =
+        createdDate &&
+        updatedDate &&
+        createdDate.getTime() !== updatedDate.getTime();
 
     const formattedUpdatedDate = updatedDate
         ? `${updatedDate.toLocaleDateString()} ${updatedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
@@ -85,6 +93,7 @@ export default function useReport(id, navigation) {
         getPriorityConfig,
         updateField,
         formattedDate,
-        formattedUpdatedDate
+        formattedUpdatedDate,
+        hasBeenUpdated
     };
 }

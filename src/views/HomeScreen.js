@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import {
+    Alert,
     Animated,
     FlatList,
     Image,
@@ -10,11 +11,33 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import { removeToken } from "../models/api";
 import StatBox from "../components/StatBox";
 import useHome from "../hooks/useHome";
 
 export default function HomeScreen() {
     const navigation = useNavigation();
+
+    const handleLogout = () => {
+        Alert.alert(
+            "Log out",
+            "Do you want to log out?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Log out",
+                    style: "destructive",
+                    onPress: async () => {
+                        await removeToken();
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: "Login" }],
+                        });
+                    },
+                },
+            ]
+        );
+    };
 
     const {
         reports,
@@ -29,6 +52,14 @@ export default function HomeScreen() {
 
     return (
         <View style={styles.container}>
+            <View style={styles.topBar}>
+                <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                    <View style={styles.logoutIconCircle}>
+                        <MaterialCommunityIcons name="logout" size={18} color="#1f2a7a" />
+                    </View>
+                    <Text style={styles.logoutText}>Logout</Text>
+                </TouchableOpacity>
+            </View>
 
             {/* Logo */}
             <Image
@@ -56,7 +87,7 @@ export default function HomeScreen() {
             <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
                 <FlatList
                     data={reports}
-                    keyExtractor={(item, index) => item.id ?? index.toString()}
+                    keyExtractor={(item, index) => item._id ?? item.id ?? index.toString()}
                     refreshControl={
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                     }
@@ -65,12 +96,13 @@ export default function HomeScreen() {
                     }
                     renderItem={({ item }) => {
                         const config = getPriorityConfig(item.priority);
+                        const reportId = item._id ?? item.id;
 
                         return (
                             <TouchableOpacity
                                 style={[styles.row, { borderLeftColor: config.color }]}
                                 onPress={() =>
-                                    navigation.navigate("ReportDetail", { id: String(item.id) })
+                                    navigation.navigate("ReportDetail", { id: String(reportId) })
                                 }
                             >
                                 {/* Priority */}
@@ -126,9 +158,39 @@ const styles = StyleSheet.create({
         backgroundColor: "#7fa1b3",
     },
 
+    topBar: {
+        alignItems: "flex-end",
+        marginBottom: 8,
+    },
+
+    logoutButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#1f2a7a",
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 30,
+        elevation: 6,
+    },
+
+    logoutIconCircle: {
+        backgroundColor: "#fff",
+        borderRadius: 20,
+        width: 28,
+        height: 28,
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: 6,
+    },
+
+    logoutText: {
+        color: "#fff",
+        fontWeight: "bold",
+    },
+
     logo: {
-        width: 200,
-        height: 200,
+        width: 160,
+        height: 160,
         alignSelf: "center",
         marginBottom: 10,
     },

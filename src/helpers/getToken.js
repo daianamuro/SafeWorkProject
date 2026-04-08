@@ -5,7 +5,7 @@ export const getToken = async (key) => {
         const token = await SecureStore.getItemAsync(key);
         return token;
     } catch (error) {
-        console.log("Error obteniendo token", error);
+        console.log("Error getting token", error);
         return null;
     }
 };
@@ -16,7 +16,7 @@ export const guardarToken = async (key, value) => {
         console.log(key, value)
         await SecureStore.setItemAsync(key, value);
     } catch (error) {
-        console.log("Error guardando token", error);
+        console.log("Error saving token", error);
     }
 };
 
@@ -24,6 +24,6 @@ export const eliminarToken = async (key) => {
     try {
         await SecureStore.deleteItemAsync(key);
     } catch (error) {
-        console.log("Error eliminando token", error);
+        console.log("Error deleting token", error);
     }
 };

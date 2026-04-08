@@ -1,28 +1,36 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Button, Text, TextInput, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import ActionButton from "../components/ActionButton";
+import Card from "../components/Card";
+import Input from "../components/Input";
 import { useRegister } from "../hooks/useRegister";
 import { register } from "../services/registerService";
 
 export default function SignUpScreen({ navigation }) {
   const {
-    name, setName,
-    lastname, setLastname,
-    email, setEmail,
-    password, setPassword,
-    role, setRole,
+    name,
+    setName,
+    lastname,
+    setLastname,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    role,
+    setRole,
     handleRegisterBtn
   } = useRegister();
 
-  // Guardar usuario en lista local
   const saveUserOffline = async (user) => {
     try {
       const existing = await AsyncStorage.getItem("users");
       const users = existing ? JSON.parse(existing) : [];
       users.push(user);
       await AsyncStorage.setItem("users", JSON.stringify(users));
-      console.log("Usuario guardado offline");
+      console.log("User saved offline");
     } catch (error) {
-      console.error("Error guardando offline:", error);
+      console.error("Error saving offline user:", error);
     }
   };
 
@@ -30,38 +38,168 @@ export default function SignUpScreen({ navigation }) {
     if (!handleRegisterBtn()) return;
 
     const user = { name, lastname, email, password, role };
-    console.log("ENVIANDO:", user);
+    console.log("Sending user:", user);
 
     try {
       const res = await register(user);
-      console.log("RESPUESTA:", res);
+      console.log("Register response:", res);
 
-      if (res.token || res.success) {
-        alert("Registro exitoso");
-
-        // Guardar también en local
-        await saveUserOffline({ ...user, token: res.token });
-
+      if (res.ok) {
+        alert("Registration successful");
+        await saveUserOffline({ ...user, token: res.data?.token });
         navigation.replace("Login");
       } else {
-        alert("Error en registro");
+        alert(res.error || "Registration failed");
       }
-    } catch (error) {
-      alert("Error al registrar");
+    } catch (_error) {
+      alert("Error while registering");
     }
   };
 
   return (
-    <View style={{ marginTop: 50, padding: 20 }}>
-      <Text style={{ fontSize: 20, marginBottom: 20 }}>Registro</Text>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
+      <View style={styles.container}>
+        <Image
+          source={require("../../assets/images/logo.png")}
+          style={styles.logo}
+        />
 
-      <TextInput placeholder="Nombre" value={name} onChangeText={setName} />
-      <TextInput placeholder="Apellido" value={lastname} onChangeText={setLastname} />
-      <TextInput placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
-      <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
-      <TextInput placeholder="Role" value={role} onChangeText={setRole} />
+        <View style={styles.heroIcon}>
+          <MaterialCommunityIcons name="account-star" size={30} color="#1f2a7a" />
+        </View>
 
-      <Button title="Registrarse" onPress={onRegister} />
-    </View>
+        <Text style={styles.title}>Create your account</Text>
+
+        <Card>
+          <Input
+            label="First name"
+            value={name}
+            onChangeText={setName}
+            placeholder="Enter your first name"
+          />
+        </Card>
+
+        <Card>
+          <Input
+            label="Last name"
+            value={lastname}
+            onChangeText={setLastname}
+            placeholder="Enter your last name"
+          />
+        </Card>
+
+        <Card>
+          <Input
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Enter your email"
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+        </Card>
+
+        <Card>
+          <Input
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Create a password"
+            secureTextEntry
+          />
+        </Card>
+
+        <Card>
+          <Input
+            label="Role"
+            value={role}
+            onChangeText={setRole}
+            placeholder="Enter your role"
+          />
+        </Card>
+
+        <View style={styles.actionsRow}>
+          <ActionButton
+            title="Sign Up"
+            icon="person-add"
+            color="#1f2a7a"
+            onPress={onRegister}
+          />
+        </View>
+
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <MaterialCommunityIcons name="login" size={18} color="#1f2a7a" />
+          <Text style={styles.secondaryText}>Back to login</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollContent: {
+    flexGrow: 1,
+  },
+
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#7fa1b3",
+  },
+
+  logo: {
+    width: 160,
+    height: 160,
+    alignSelf: "center",
+    marginBottom: 10,
+    marginTop: 12,
+  },
+
+  heroIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#fff",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+    elevation: 4,
+  },
+
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+
+  actionsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+    gap: 10,
+  },
+
+  secondaryButton: {
+    marginTop: 14,
+    marginBottom: 24,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    elevation: 3,
+    gap: 8,
+  },
+
+  secondaryText: {
+    color: "#1f2a7a",
+    fontWeight: "600",
+  },
+});

@@ -19,13 +19,7 @@ export default function useHome() {
         return () => clearInterval(interval);
     }, []);
 
-    useFocusEffect(
-        useCallback(() => {
-            loadReports();
-        }, [])
-    );
-
-    const loadReports = async () => {
+    const loadReports = useCallback(async () => {
         const response = await getAllReports();
 
         if (response.ok) {
@@ -40,7 +34,13 @@ export default function useHome() {
             duration: 500,
             useNativeDriver: true,
         }).start();
-    };
+    }, [fadeAnim]);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadReports();
+        }, [loadReports])
+    );
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -70,8 +70,9 @@ export default function useHome() {
 
         const now = currentTime;
         const diffMs = now - latestDate;
+        const diffMinutes = Math.floor(diffMs / 60000);
 
-        return Math.floor(diffMs / 60000);
+        return Math.max(0, diffMinutes);
     })();
 
     const lastUpdateLabel =

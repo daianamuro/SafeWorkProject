@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getToken } from "./getToken"
 
-export const api = axios.create({
+const apiClient = axios.create({
     baseURL: "https://save-work-utr-project.onrender.com",
     timeout: 10000,
     headers: {
@@ -9,7 +9,7 @@ export const api = axios.create({
     }
 })
 
-api.interceptors.request.use(
+apiClient.interceptors.request.use(
     async (config) => {
         try {
             const token = await getToken('JWTToken')
@@ -26,4 +26,4 @@ api.interceptors.request.use(
             return Promise.reject(error)
     }
 )
-export default api;
+export default apiClient;

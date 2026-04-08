@@ -1,5 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import ActionButton from "../components/ActionButton";
+import Card from "../components/Card";
+import Input from "../components/Input";
 import { guardarToken } from "../helpers/getToken";
 import { useLogin } from "../hooks/useLogin";
 import { login } from "../services/loginService";
@@ -9,14 +13,14 @@ export default function LoginScreen({ navigation }) {
 
   const onLogin = async () => {
     try {
-      console.log("Click");
+      console.log("Login button pressed");
 
       if (!handleLoginBtn()) return;
 
       const res = await login(email, password);
-      console.log("RESPUESTA:", res);
+      console.log("Login response:", res);
 
-      const token = res.token;
+      const token = res?.token;
 
       if (token) {
         await guardarToken("JWTToken", token);
@@ -34,9 +38,8 @@ export default function LoginScreen({ navigation }) {
         );
 
         if (found) {
-          alert("Login offline exitoso");
+          alert("Offline login successful");
 
-          // Guardar un token ficticio para mantener sesión
           await guardarToken("JWTToken", found.token || "offline-token");
 
           navigation.reset({
@@ -44,47 +47,69 @@ export default function LoginScreen({ navigation }) {
             routes: [{ name: "Home" }],
           });
         } else {
-          alert("Error en login: usuario no encontrado");
+          alert(
+            res?.error
+              ? "Login failed or no connection available"
+              : "Login failed: user not found"
+          );
         }
       }
     } catch (error) {
-      console.log("LOGIN ERROR:", error.response?.data || error.message);
-      alert("Error en login, revisa tus datos");
+      console.log("Login error:", error.response?.data || error.message);
+      alert("Login failed, please check your credentials");
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Login</Text>
+      <Image
+        source={require("../../assets/images/logo.png")}
+        style={styles.logo}
+      />
 
-        <TextInput
-          placeholder="Email"
-          style={styles.input}
+      <View style={styles.heroIcon}>
+        <MaterialCommunityIcons name="shield-account" size={30} color="#1f2a7a" />
+      </View>
+
+      <Text style={styles.title}>Welcome back</Text>
+
+      <Card>
+        <Input
+          label="Email"
           value={email}
           onChangeText={setEmail}
+          placeholder="Enter your email"
           autoCapitalize="none"
+          keyboardType="email-address"
         />
+      </Card>
 
-        <TextInput
-          placeholder="Password"
-          style={styles.input}
+      <Card>
+        <Input
+          label="Password"
           value={password}
           onChangeText={setPassword}
+          placeholder="Enter your password"
           secureTextEntry
         />
+      </Card>
 
-        <View style={styles.buttonContainer}>
-          <Button title="Login" color="#0A84FF" onPress={onLogin} />
-        </View>
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button
-          title="No tengo una cuenta"
-          color="#0A84FF"
-          onPress={() => navigation.navigate("SignUp")}
+      <View style={styles.actionsRow}>
+        <ActionButton
+          title="Login"
+          icon="login"
+          color="#1f2a7a"
+          onPress={onLogin}
         />
       </View>
+
+      <TouchableOpacity
+        style={styles.secondaryButton}
+        onPress={() => navigation.navigate("SignUp")}
+      >
+        <MaterialCommunityIcons name="account-plus" size={18} color="#1f2a7a" />
+        <Text style={styles.secondaryText}>Create an account</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -92,33 +117,59 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#3A7DFF",
+    padding: 20,
+    backgroundColor: "#7fa1b3",
+    justifyContent: "center",
+  },
+
+  logo: {
+    width: 160,
+    height: 160,
+    alignSelf: "center",
+    marginBottom: 10,
+  },
+
+  heroIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#fff",
+    alignSelf: "center",
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 16,
+    elevation: 4,
   },
-  card: {
-    width: "80%",
-    backgroundColor: "#E5E5E5",
-    padding: 20,
-    borderRadius: 15,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-  },
+
   title: {
-    fontSize: 24,
+    fontSize: 22,
+    fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    fontWeight: "bold",
   },
-  input: {
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  buttonContainer: {
+
+  actionsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 10,
+    gap: 10,
+  },
+
+  secondaryButton: {
+    marginTop: 14,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 30,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    elevation: 3,
+    gap: 8,
+  },
+
+  secondaryText: {
+    color: "#1f2a7a",
+    fontWeight: "600",
   },
 });

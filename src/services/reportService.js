@@ -6,11 +6,11 @@ export const getAllReports = async () => {
         const res = await api.get(ENDPOINTS.getAllReports);
         return { ok: true, data: res.data };
     } catch (error) {
-        console.error("Error cargando reportes:", error?.response?.data || error.message);
+        console.error("Error loading reports:", error?.response?.data || error.message);
         return { 
             ok: false,
             data: [],
-            error: error?.response?.data || "Error desconocido"
+            error: error?.response?.data || "Unknown error"
         };
     }
 };
@@ -21,8 +21,8 @@ export const createReport = async (report) => {
         const res = await api.post(ENDPOINTS.createReport, report);
         return { ok: true, data: res.data };
     } catch (error) {
-        console.error("Error creando reporte:", error?.response?.data || error.message);
-        return { ok: false, data: null, error: error?.response?.data || "Error desconocido" };
+        console.error("Error creating report:", error?.response?.data || error.message);
+        return { ok: false, data: null, error: error?.response?.data || "Unknown error" };
     }
 };
 
@@ -32,8 +32,8 @@ export const getReportById = async (id) => {
         const res = await api.get(ENDPOINTS.getReportById(id));
         return { ok: true, data: res.data };
     } catch (error) {
-        console.error("Error obteniendo reporte:", error?.response?.data || error.message);
-        return { ok: false, data: null, error: error?.response?.data || "Error desconocido" };
+        console.error("Error getting report:", error?.response?.data || error.message);
+        return { ok: false, data: null, error: error?.response?.data || "Unknown error" };
     }
 };
 
@@ -43,8 +43,8 @@ export const deleteReport = async (id) => {
         await api.delete(ENDPOINTS.deleteReport(id));
         return { ok: true };
     } catch (error) {
-        console.error("Error eliminando:", error?.response?.data || error.message);
-        return { ok: false, error: error?.response?.data || "Error desconocido" };
+        console.error("Error deleting report:", error?.response?.data || error.message);
+        return { ok: false, error: error?.response?.data || "Unknown error" };
     }
 };
 
@@ -54,7 +54,7 @@ export const updateReport = async (id, data) => {
         const res = await api.put(ENDPOINTS.updateReport(id), data);
         return { ok: true, data: res.data };
     } catch (error) {
-        console.error("Error actualizando:", error?.response?.data || error.message);
-        return { ok: false, data: null, error: error?.response?.data || "Error desconocido" };
+        console.error("Error updating report:", error?.response?.data || error.message);
+        return { ok: false, data: null, error: error?.response?.data || "Unknown error" };
     }
 };

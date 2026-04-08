@@ -7,17 +7,17 @@ export const useLogin = () => {
 
     const handleLoginBtn = () => {
         if (!email || !password) {
-            alert("Campos vacíos");
+            alert("Please fill in all fields");
             return false;
         }
 
         if (!validate("email", email)) {
-            alert("Correo inválido");
+            alert("Invalid email");
             return false;
         }
 
         if (!validate("password", password)) {
-            alert("Contraseña inválida. Minimo 1 mayuscla, minuscula y numero. Minimo 8 caracteres");
+            alert("Invalid password. It must include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 8 characters.");
             return false;
         }
 

@@ -6,7 +6,10 @@ export default function Input({
     onChangeText,
     multiline = false,
     editable = true,
-    placeholder = ""
+    placeholder = "",
+    secureTextEntry = false,
+    autoCapitalize = "sentences",
+    keyboardType = "default"
 }) {
     return (
         <View>
@@ -18,6 +21,9 @@ export default function Input({
                 editable={editable}
                 multiline={multiline}
                 placeholder={placeholder}
+                secureTextEntry={secureTextEntry}
+                autoCapitalize={autoCapitalize}
+                keyboardType={keyboardType}
             />
         </View>
     );
